@@ -101,8 +101,6 @@ export default function Home() {
           </div>
         )}
       </CardContent>
-
-      {/* Bottom Input Bar (download left, input center, send right) */}
       <div className="sticky bottom-0 w-full border-t bg-white p-4">
         <div className="flex items-center gap-3">
           <Button asChild variant="outline" disabled={!downloadUrl}>
