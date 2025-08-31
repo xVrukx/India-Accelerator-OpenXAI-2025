@@ -3,8 +3,8 @@ import fs from 'fs';
 import path from 'path';
 import { spawnSync } from 'child_process';
 import pdfParse from 'pdf-parse';
-import mammoth from 'mammoth'; // for DOCX
-import pptx2json from 'pptx2json'; // for PPTX
+import mammoth from 'mammoth';
+import pptx2json from 'pptx2json';
 
 const SUMMARY_FOLDER = path.join(process.cwd(), 'summary');
 const SUMMARY_output = path.join(process.cwd(), 'summary_final');
@@ -12,7 +12,6 @@ const HISTORY_FILE = path.join(SUMMARY_output, 'history.json');
 const MAX_CHUNK_WORDS = 2000;
 const MAX_SUMMARY_TOKENS = 363;
 
-// ✅ Helpers
 function chunkText(text: string, maxWords: number): string[] {
   const words = text.split(/\s+/);
   const chunks: string[] = [];
@@ -43,7 +42,6 @@ function runLlama(prompt: string): string {
   return result.stdout.trim();
 }
 
-// ✅ Detect file type from base64 header
 function getFileExtension(base64: string): string {
   if (base64.startsWith('data:application/pdf')) return 'pdf';
   if (base64.startsWith('data:application/vnd.openxmlformats-officedocument.wordprocessingml.document')) return 'docx';
@@ -52,7 +50,6 @@ function getFileExtension(base64: string): string {
   return 'unknown';
 }
 
-// ✅ Extract text based on file type
 async function extractText(fileBuffer: Buffer, ext: string): Promise<string> {
   if (ext === 'pdf') {
     const pdfData = await pdfParse(fileBuffer);
@@ -92,7 +89,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!fs.existsSync(SUMMARY_FOLDER)) fs.mkdirSync(SUMMARY_FOLDER);
   if (!fs.existsSync(SUMMARY_output)) fs.mkdirSync(SUMMARY_output);
 
-  // ✅ Split & summarize chunks
   const chunks = chunkText(text, MAX_CHUNK_WORDS);
   const summaries: string[] = [];
 
@@ -110,7 +106,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     fs.writeFileSync(filename, summary);
   }
 
-  // ✅ Final merge
   const finalText = summaries.join('\n\n');
   const finalPrompt = `
 You are a summarizer AI. 
@@ -126,7 +121,6 @@ ${finalText}
   let finalSummary = runLlama(finalPrompt);
   finalSummary = cleanText(finalSummary);
 
-  // ✅ Save as PDF
   const timestamp = Date.now();
   const filename = `summary_${timestamp}.pdf`;
   const filePath = path.join(SUMMARY_output, filename);
@@ -165,7 +159,6 @@ ${finalText}
   const pdfBytes = await pdfDoc.save();
   fs.writeFileSync(filePath, pdfBytes);
 
-  // ✅ Update history
   const entry = { filename, createdAt: new Date().toISOString(), summary: finalSummary };
   let history: any[] = [];
   if (fs.existsSync(HISTORY_FILE)) {
@@ -179,7 +172,6 @@ ${finalText}
     downloadUrl: `/api/download-summary?file=${filename}`,
   });
 
-  // ✅ Cleanup temp chunks
   if (fs.existsSync(SUMMARY_FOLDER)) {
     fs.readdirSync(SUMMARY_FOLDER).forEach(f => {
       fs.unlinkSync(path.join(SUMMARY_FOLDER, f));
