@@ -5,9 +5,7 @@ import Sidebar from '@/components/ui/sidebar'
 
 export const metadata = {
   title: 'Student Notes Summarizer',
-  description: 'Summarize PDF notes and ask summary-related questions',
-    icons: {
-    icon: '/study.ico'}
+  description: 'Summarize PDF notes and ask summary-related questions'
 }
 
 function Navbar() {
