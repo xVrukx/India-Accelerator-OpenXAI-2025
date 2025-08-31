@@ -41,10 +41,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="bg-slate-50 text-gray-900 min-h-screen font-sans">
         <div className="min-h-screen flex flex-col">
           <Navbar />
-
-          {/* Shell: Sidebar (1/4) + Main (3/4) */}
           <div className="flex-1 flex min-h-0">
-            {/* Sidebar */}
             <aside className="w-1/4 min-w-[260px] bg-slate-900 text-white flex flex-col">
               <div className="p-4 border-b border-slate-800">
                 <h2 className="text-xl font-bold">📥 Downloads</h2>
