@@ -6,7 +6,6 @@ import { spawnSync } from 'child_process'
 const SUMMARY_OUTPUT = path.join(process.cwd(), 'summary_final')
 const HISTORY_FILE = path.join(SUMMARY_OUTPUT, 'history.json')
 
-// 🔹 Reuse llama runner
 function runLlama(prompt: string): string {
   const result = spawnSync('ollama', ['run', 'mannix/phi3-mini-4k:latest'], {input: prompt, encoding: 'utf-8',
   });
@@ -29,7 +28,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
   const history = JSON.parse(fs.readFileSync(HISTORY_FILE, 'utf-8'))
 
-  // pick summary (specific one or latest)
   let targetSummary = null
   if (summaryName) {
     targetSummary = history.find((h: any) => h.filename === summaryName)
@@ -42,7 +40,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(404).json({ error: 'No summary found.' })
   }
 
-  // 🔹 Construct a Q&A prompt for the model
   const prompt = `
 You are an assistant answering questions based on a given summary.
 Summary:
